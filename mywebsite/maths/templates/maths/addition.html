@@ -1,0 +1,26 @@
+
+{% extends 'maths/base.html'%}
+
+{%block content %}
+
+<form method="POST" action="/add/">
+      {% csrf_token%}
+     
+    {% for each_number1,each_number2,validate_val,output in zippedlist %}
+        <p >    {{ each_number1}}  +  {{ each_number2 }}  = 
+        
+          {% if  not validate_val %}
+               <input type="text" name="inputans"> 
+               <span style= "color:red">Please fill in the answer</span>
+            {%else %}
+                <input type="text" name="inputans" value={{output}}>  
+               {%endif %}
+            </p>
+    {%endfor %}
+
+   <button name="submit" type="submit">Submit</button>
+</form>
+{%endblock%}
+    
+
+<!-- <input type="text" name="inputans{{forloop.counter}}">  -->
