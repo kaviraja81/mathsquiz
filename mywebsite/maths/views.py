@@ -1,9 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .forms import AdditionForm,RegisterForm
 from .validate import calcscore,validate
+from django.contrib.auth  import login,logout,authenticate 
+
 
 # Create your views here.
 
@@ -46,7 +48,20 @@ def add(response):
         return render(response, "maths/addition.html", {"zippedlist": zippedlist})
 
 def register(request):
+    
+    if request.method=="POST" :
+        form=RegisterForm(request.POST)
+        if form.is_valid():
+           form.save()
+           username=form.cleaned_data.get("username")
+           print(username)
+      #     login(request, username)
+           return redirect("/")
+        else:
+            for msg in form.error_messages:
+                print(form.error_messages[msg])
 
+            return render(request,"maths/register.html",{"form":form})
     form=RegisterForm()
-
+   
     return render(request,"maths/register.html",{"form":form})
