@@ -5,15 +5,20 @@
     integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
     crossorigin="anonymous"></script>
   {%block title %}
-  This is where Navbar should come
+
+  {% include 'maths/includes/navbar.html' %}
+
   {%endblock%}
 </head>
 
 <body>
-  {% include 'maths/includes/messaging.html' %}
-  {%block content %}
 
-  {%endblock %}
+  {% include 'maths/includes/messaging.html' %}
+  <div class="container">
+    {%block content %}
+
+    {%endblock %}
+  </div>
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
     integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
     crossorigin="anonymous"></script>
