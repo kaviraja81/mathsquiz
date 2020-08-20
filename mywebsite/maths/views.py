@@ -8,12 +8,14 @@ from django.contrib.auth.forms import UserCreationForm
 from .forms import AdditionForm,RegisterForm
 from .validate import calcscore,validate
 from django.contrib.auth  import login,logout,authenticate 
-
+from .models import User
+from maths.models import Score 
 # Create your views here.
 
 
 def index(request):
-    return HttpResponse("This is the addition view")
+  #  return HttpResponse("This is the addition view")
+    return render(request, "maths/homepage.html", {})
 
 
 
@@ -36,7 +38,12 @@ def add(response):
         else:
             output = [int(i) for i in output]
             score = calcscore(output, result)
+            username = User.objects.get(username=response.user.username)
 
+         #   username=response.user.username
+            t=Score(score=score,grade='1',category='1',username=username)
+            t.save()
+            
             return HttpResponse(f'Good Job! Your Score is {score} /10')
     else:
         form1 = AdditionForm()
