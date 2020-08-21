@@ -6,9 +6,13 @@ import numpy as np
 
 class AdditionForm():
 
-    def randnum(self):
-        number1=np.random.randint(0,10,10)
-        return number1
+    def randnumsingledigit(self):
+        number=np.random.randint(0,10,10)
+        return number
+    
+    def randnumdoubledigit(self):
+        number=np.random.randint(10,100,10)
+        return number
     # class Meta:
     #     model=User
     #     fields=["number1","username","password1"]

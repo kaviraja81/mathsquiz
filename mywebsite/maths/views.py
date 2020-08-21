@@ -20,13 +20,15 @@ def index(request):
 
 
 # val=[response.POST.get('inputans{}'.format(i)) for i in range(1,11)]
- 
+
+def grade1(response):
+    return render(response,"maths/grade.html",{})
 
 
-def add(response):
+def add(response,category):
     global result
     global num1, num2
-
+    
     if response.method == "POST":
         output = response.POST.getlist('inputans')
         print(num1, num2)
@@ -47,8 +49,13 @@ def add(response):
             return HttpResponse(f'Good Job! Your Score is {score} /10')
     else:
         form1 = AdditionForm()
-        num1 = form1.randnum()
-        num2 = form1.randnum()
+        if category == 1 :
+            num1 = form1.randnumsingledigit()
+            num2 = form1.randnumsingledigit()
+        else : 
+            num1 = form1.randnumdoubledigit()
+            num2 = form1.randnumdoubledigit()
+            
         output = [0 for i in range(10)]
         validval = [True for i in range(10)]
         zippedlist = zip(num1, num2, validval, output)

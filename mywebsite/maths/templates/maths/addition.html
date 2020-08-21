@@ -1,13 +1,26 @@
 
 {% extends 'maths/base.html'%}
 
-{%block content %}
 
-<form method="POST" action="/add/">
+{%block content %}
+<style> 
+.center {
+   margin: auto;
+   width: 50%;
+   border: 3px solid green;
+   padding: 10px;
+ }
+</style>
+
+<div class="container p-2">
+{%include 'maths/includes/verticalnavbar.html'%}
+</div>
+<div class=" container center p-2">
+<form method="POST" action=""style="">
       {% csrf_token%}
      
-    {% for each_number1,each_number2,validate_val,output in zippedlist %}
-        <p >    {{ each_number1}}  +  {{ each_number2 }}  = 
+    {% for each_number1,each_number2,validate_val,output in  zippedlist %}
+        <p >       {{ each_number1}}  +      {{ each_number2 }}  = 
         
           {% if  not validate_val %}
                <input type="text" name="inputans"> 
@@ -20,6 +33,8 @@
 
    <button name="submit" type="submit"class="btn btn-info">Submit</button>
 </form>
+</div>
+
 {%endblock%}
     
 
