@@ -18,11 +18,18 @@
 <div class=" container center p-2">
 <form method="POST" action=""style="">
       {% csrf_token%}
-     
-    {% for each_number1,each_number2,validate_val,output in  zippedlist %}
-        <p >       {{ each_number1}}  +      {{ each_number2 }}  = 
-        
-          {% if  not validate_val %}
+      {% for each_number1,each_number2,validate_val,output in  zippedlist %}
+      {% if operator == '-' %}
+         {% if each_number1  < each_number2 %}
+           <p >       {{ each_number2}}  {{ operator }}     {{ each_number1 }}  = 
+         {% else %}
+         <p >       {{ each_number1}}  {{ operator }}     {{ each_number2 }}  = 
+
+         {% endif %}
+      {% else %}
+          <p >       {{ each_number1}}  {{ operator }}     {{ each_number2 }}  = 
+      {% endif %}
+      {% if  not validate_val %}
                <input type="text" name="inputans"> 
                <span style= "color:red">Please fill in the answer</span>
             {%else %}

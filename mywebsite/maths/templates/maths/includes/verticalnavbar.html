@@ -29,7 +29,7 @@
     .sidenav a {
         padding:6px 8px 6px 16px;
         text-decoration: none;
-        font-size:25px;
+        font-size:20px;
         color: white;
         display:block;
     }
@@ -44,8 +44,15 @@
     }
     </style>
     <div class="sidenav p-2 ">
-		<a href="/grade1/add/1">Single Digit Add</a>
-        <a href="/grade1/add/2"> Double digit Add</a>
-        <a href="/grade1sub"> Single digit Subtract</a>
-        <a href="/grade1sub2digit"> Double digit Subtract</a>
+    
+    {% if '/grade1/' in request.path %}
+        <a href="/grade1/add/1">Single Digit Add</a>
+        <a href="/grade1/add/3"> Tens Addition</a>
+        <a href="/grade1/sub/4"> Single digit Subtract</a>
+    {%endif%}
+    {% if '/grade2/' in request.path %}
+        <a href="/grade2/add/2"> Double digit Add</a>
+        <a href="/grade2/sub/5"> Double digit Subtract</a>
+        <a href="/grade1/sub/6"> Tens Subtraction </a>
+    {%endif%}
 	</div>
