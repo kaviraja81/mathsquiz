@@ -7,4 +7,6 @@ class Score(models.Model):
    grade=models.IntegerField(null=True)
  #   number1=models.ListField()
    category=models.CharField(max_length=2000)
+   totalattempts=models.IntegerField(null=True)
+   averagescore=models.IntegerField(null=True)
 

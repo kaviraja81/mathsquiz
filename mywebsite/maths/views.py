@@ -3,13 +3,20 @@ from django.http import HttpResponse
 from django import forms
 from django.contrib import messages
 
-
+import plotly.express as px
 from django.contrib.auth.forms import UserCreationForm
 from .forms import AdditionForm,RegisterForm
 from .validate import calcscore,validate
 from django.contrib.auth  import login,logout,authenticate 
+
 from .models import User
 from maths.models import Score 
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.use('Agg')
+
+from io import StringIO
+
 # Create your views here.
 
 
@@ -17,31 +24,65 @@ def index(request):
   #  return HttpResponse("This is the addition view")
     return render(request, "maths/homepage.html", {})
 
-
-
 # val=[response.POST.get('inputans{}'.format(i)) for i in range(1,11)]
 
-def grade(response):
-    return render(response,"maths/grade.html",{})
+def grade(request):
+    return render(request,"maths/grade.html",{})
 
+def report(request):
+    if not request.user.is_authenticated:
+        return HttpResponse("<h2>Please login to see the report </h2> <a class='button' href='/login'>Login</a>" )
+    username = User.objects.get(username=request.user.username)
+    scrobject=Score.objects.filter(username=username)
+    fig,ax = plt.subplots()
+    #print(scrobject.item_set.all())
+    avgscr=[]
+    ctgry=[]
+    for i in scrobject.all():
+        avgscr.append(i.averagescore)
+            
+        if i.category == '1' :
+            ctgry.append('Single Digit Addition')
+        elif i.category== '2':
+            ctgry.append('Double Digit Addition') 
+        elif i.category == '3' :
+            ctgry.append('Addition with Tens')
+        elif i.category == '4' :
+            ctgry.append('Single Digit Subtraction')
+        elif i.category == '5' :
+            ctgry.append('Double Digit Subtraction')
+        elif i.category == '6': 
+            ctgry.append('Subtraction with Tens')
+        
+    
+    ax.set_title("Average Score for each category",color="darkblue")
+    ax.set_xlabel("Category")
+    ax.set_ylabel("Average Score")
+    ax.bar(ctgry,avgscr)
+    imgdata=StringIO()
+    fig.savefig(imgdata,format='svg')
+    imgdata.seek(0)
+    plot_data=imgdata.getvalue()
+   # plot_data=px.bar(scrobject,x=scrobject.score,y=scrobject.category)
+    #plot_data=""
+ #   plot_data.write_html('./templates/maths/report1.html')
+    return render(request,"maths/report.html",{"score":Score.objects.filter(username=username),"plot":plot_data},)
 
-def add(response,category):
+def mathematics(request,category):
     global result
     global num1, num2
     operator = '+'
-    print(response.get_full_path())
-    # print(response.path)
-    # print(response.build_absolute_uri())
-    valsplit=response.path.split('/')
+    print(request.get_full_path())
+    # print(request.path)
+    # print(request.build_absolute_uri())
+    valsplit=request.path.split('/')
     if valsplit[2] == 'add' :
        operator = '+'
     elif valsplit[2] == 'sub':
         operator = '-'
     
-
-    print (operator)
-    if response.method == "POST":
-        output = response.POST.getlist('inputans')
+    if request.method == "POST":
+        output = request.POST.getlist('inputans')
         print(num1, num2)
         print(output)
         validoutput, IsValid = validate(output)
@@ -50,18 +91,34 @@ def add(response,category):
         if not IsValid:
             print("not valid")
             zippedlist = zip(num1, num2, validoutput, output)
-            return render(response, "maths/addition.html", {"zippedlist": zippedlist,"operator": operator})
+            return render(request, "maths/addition.html", {"zippedlist": zippedlist,"operator": operator})
             
         else:
+            
             output = [int(i) for i in output]
             score = calcscore(output, result)
-            username = User.objects.get(username=response.user.username)
+            username = User.objects.get(username=request.user.username)
+            try :
+                t=Score.objects.get(username=username,category=valsplit[3],grade=valsplit[1][5])
+                t.score=score
+                t.totalattempts+=1
+                t.averagescore=int((t.averagescore+score)/(t.totalattempts)) 
+                t.save(update_fields=['totalattempts','averagescore','score'])
+                print(t.averagescore)
+            except Score.DoesNotExist : 
+                print("Score Does not")
+                totalattempts = 1
+                average=score/totalattempts
+                t=Score(username=username,category=valsplit[3],grade=valsplit[1][5],score=score,
+                        totalattempts=totalattempts,
+                        averagescore=average
+                        )
+                t.save()
+                print(average)
+            print(t)
 
-         #   username=response.user.username
-            t=Score(score=score,grade=valsplit[1][5],category=valsplit[3],username=username)
-            t.save()
             
-            return HttpResponse(f'Good Job! Your Score is {score} /10')
+            return HttpResponse('<h3>Good Job! Your Score is {{score}} /10<h3>')
     else:
         ##  Category 1 is Single Digit Addition, 
         ##  Category 2 is Double Digit Addition
@@ -70,16 +127,17 @@ def add(response,category):
         ##  Category 5 is Double Digit Subtraction
         ##  Category 6 is Subtraction wtih tens
         form1 = AdditionForm()
+        print("category",category)
         if category == 1 or category == 4 :
             num1 = form1.randnumsingledigit()
             num2 = form1.randnumsingledigit()
-        elif category == 2 or category == 4: 
+        elif category == 2 or category == 5: 
             num1 = form1.randnumdoubledigit()
             num2 = form1.randnumdoubledigit()
         elif category == 3 or category == 6 :
-            num1 = form1.randnumsingledigit()
-            num2 = form1.randnumsingledigit()*10 
-            
+            num1 = form1.randnumsingledigit() * 10
+            num2 = form1.randnumsingledigit()
+        print(num1,num2)
         # if operator == '-' :
         #     [x for x,y in num1 if num1 > num2 else: y  ]
         #    if num1 > num2 : 
@@ -92,7 +150,7 @@ def add(response,category):
         else : result = num1-num2
         validval = [True for i in range(10)]
         context={}
-        return render(response, "maths/addition.html", {"zippedlist": zippedlist,"operator": operator})
+        return render(request, "maths/addition.html", {"zippedlist": zippedlist,"operator": operator})
 
 def register(request):
     
