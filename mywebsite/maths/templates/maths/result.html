@@ -1,0 +1,18 @@
+{% extends 'maths/base.html'%}
+{% block content %}
+{% autoescape off %}
+{% if score == 10 %}
+    <h1 >Excellent ! You have mastered this skill ! </h1>
+    <h2>Your score is 10/10</h2>
+{% elif score > 7 %}
+    <h2 class="text-info">Good Job ! Your score is {{score}}/10</h2>
+{% elif score > 3 %}
+    <h2 > Good work.Keep working on your skills! </h2>
+    <h3 class="text-primary"> Your score is {{score}}/10</h3>
+{% else %}
+    <h2 >Keep working on your skills. You can master it soon !!! </h2>
+    <h3 class="text-primary">Your score is {{score}}/10</h3>
+{%endif%}
+
+{% endautoescape  %}
+{% endblock %}

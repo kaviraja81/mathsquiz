@@ -17,7 +17,5 @@ def calcscore(output, correctresult):
     for i in range(10):
         if correctresult[i] == output[i]:
             score += 1
-            print(f"All right {i}")
-        else:
-            print("Some Wrong")
+       
     return score
